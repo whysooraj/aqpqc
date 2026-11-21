@@ -1,5 +1,6 @@
 """AQPQC Selector - Adaptive Quantum Intelligence Framework for Context-Aware Post-Quantum Cryptographic Algorithm Selection."""
 
+from aqpqc.benchmark import BenchmarkEngine, BenchmarkResult
 from aqpqc.catalog import ALGORITHM_CATALOG, PQCAlgorithm, get_algorithm, list_algorithms
 from aqpqc.telemetry import TelemetryCollector, TelemetrySnapshot
 
@@ -12,4 +13,6 @@ __all__ = [
     "list_algorithms",
     "TelemetryCollector",
     "TelemetrySnapshot",
+    "BenchmarkEngine",
+    "BenchmarkResult",
 ]
