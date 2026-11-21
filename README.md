@@ -74,6 +74,26 @@ aqpqc select --op kem --security 1 --mem 32 --mtu 576 --loss 5.0 --bw 1.0
 aqpqc select --op sign --security 5 --mem 16384 --mtu 9000 --loss 0.0 --bw 1000.0
 ```
 
+### 6. Start REST Microservice
+```bash
+aqpqc serve --host 127.0.0.1 --port 8000
+# OpenAPI documentation interactive UI: http://127.0.0.1:8000/docs
+```
+
+## Live Dynamic Handshake Demo
+
+Run the client-server socket demo negotiating PQC primitives in real time:
+
+```bash
+# Terminal 1: Start Server
+python demo/server.py 9999
+
+# Terminal 2: Run Client
+python demo/client.py 9999
+```
+
+The client measures real-time network latency and MTU, queries the AQPQC Selector for the optimal KEM (e.g., ML-KEM-512 for constrained links), exchanges public keys and ciphertexts, and derives a symmetric 256-bit session key.
+
 ## Python API Usage
 
 ```python
