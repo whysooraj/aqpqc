@@ -93,6 +93,19 @@ print("Confidence:", result.confidence)
 print("Rationale:", result.explanation)
 ```
 
+## Running Empirical Benchmarks
+
+Run the 1,000-scenario comparison across Static-Max, Static-Min, and AQPQC Selector:
+
+```bash
+python experiments/benchmark_evaluation.py 1000
+python experiments/plot_results.py
+```
+
+Generated outputs:
+- CSV: `experiments/results/benchmark_summary.csv`
+- Figures: `figures/static_vs_aqpqc_comparison.png`, `figures/feature_importance.png`
+
 ## Running Tests
 
 ```bash
