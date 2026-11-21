@@ -2,6 +2,7 @@
 
 from aqpqc.benchmark import BenchmarkEngine, BenchmarkResult
 from aqpqc.catalog import ALGORITHM_CATALOG, PQCAlgorithm, get_algorithm, list_algorithms
+from aqpqc.evaluator import evaluate_strategies
 from aqpqc.selector import AQPQCSelector, SelectionResult
 from aqpqc.telemetry import TelemetryCollector, TelemetrySnapshot
 
@@ -18,4 +19,5 @@ __all__ = [
     "BenchmarkResult",
     "AQPQCSelector",
     "SelectionResult",
+    "evaluate_strategies",
 ]
