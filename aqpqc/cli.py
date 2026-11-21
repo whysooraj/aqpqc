@@ -57,6 +57,10 @@ def build_parser() -> argparse.ArgumentParser:
     serve_parser.add_argument("--host", default="0.0.0.0", help="Host interface to bind")
     serve_parser.add_argument("--port", type=int, default=8000, help="Port to listen on")
 
+    # 7. export-c command
+    export_parser = subparsers.add_parser("export-c", help="Export freestanding C99 single-header engine")
+    export_parser.add_argument("--out", default="include/aqpqc.h", help="Output path for C header")
+
     return parser
 
 
@@ -174,6 +178,13 @@ def run_cli(args: argparse.Namespace) -> int:
         except ImportError:
             print("Error: uvicorn and fastapi are required to run the service. Install with 'pip install .[api]'.", file=sys.stderr)
             return 1
+
+    if cmd == "export-c":
+        from pathlib import Path
+        from aqpqc.transpile import export_c_header
+        out_path = export_c_header(Path(args.out))
+        print(f"Exported freestanding C99 single-header engine to: {out_path}")
+        return 0
 
     return 1
 
