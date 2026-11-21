@@ -3,6 +3,7 @@
 from aqpqc.benchmark import BenchmarkEngine, BenchmarkResult
 from aqpqc.catalog import ALGORITHM_CATALOG, PQCAlgorithm, get_algorithm, list_algorithms
 from aqpqc.evaluator import evaluate_strategies
+from aqpqc.passive_telemetry import PassiveTelemetrySnapshot, extract_kernel_tcp_telemetry
 from aqpqc.selector import AQPQCSelector, SelectionResult
 from aqpqc.telemetry import TelemetryCollector, TelemetrySnapshot
 
@@ -15,6 +16,8 @@ __all__ = [
     "list_algorithms",
     "TelemetryCollector",
     "TelemetrySnapshot",
+    "PassiveTelemetrySnapshot",
+    "extract_kernel_tcp_telemetry",
     "BenchmarkEngine",
     "BenchmarkResult",
     "AQPQCSelector",
