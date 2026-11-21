@@ -1,0 +1,4 @@
+strategy,security_satisfaction_pct,mean_latency_ms,mean_packets,severe_fragmentation_pct,memory_violation_pct,mean_utility
+static_max,100.0,84.31,4.33,85.4,0.0,-98.22
+static_min,39.7,78.9,2.57,48.2,0.0,-782.8
+aqpqc,100.0,79.15,2.73,63.2,0.0,-43.34
