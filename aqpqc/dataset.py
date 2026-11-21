@@ -43,7 +43,7 @@ def calculate_pareto_utility(
     # Packet fragmentation calculation
     safe_mtu = max(mtu_bytes, 576)
     packet_count = math.ceil(payload_bytes / safe_mtu)
-    fragmentation_penalty = max(0, packet_count - 1) * (20.0 + packet_loss_pct * 5.0)
+    fragmentation_penalty = max(0, packet_count - 1) * (15.0 + packet_loss_pct * 5.0)
 
     # Transmission and computation latency (ms)
     safe_bandwidth_bps = max(network_bandwidth_mbps * 1e6, 50000.0)
@@ -58,12 +58,16 @@ def calculate_pareto_utility(
     else:
         memory_penalty = 0.0
 
-    # Multi-objective utility balance:
-    # Security reward + efficiency bonus - latency cost - fragmentation risk - memory penalty
-    security_reward = algo.security_level * 30.0
-    latency_cost = total_latency_ms * 0.35
+    # Security reward:
+    # High-bandwidth environments reward higher security; constrained links penalize overkill overhead
+    if network_bandwidth_mbps > 50.0:
+        security_reward = algo.security_level * 10.0
+    else:
+        security_reward = required_security * 10.0 - (algo.security_level - required_security) * 5.0
 
-    return security_reward - latency_cost - fragmentation_penalty - memory_penalty
+    latency_penalty = total_latency_ms * 0.4
+
+    return security_reward - latency_penalty - fragmentation_penalty - memory_penalty
 
 
 def generate_synthetic_dataset(
@@ -79,16 +83,15 @@ def generate_synthetic_dataset(
     X_list: List[List[float]] = []
     y_list: List[int] = []
 
-    # Partition: 35% Edge/IoT, 35% Mobile/WAN, 30% Datacenter/Cloud
-    n_iot = int(n_samples * 0.35)
-    n_mobile = int(n_samples * 0.35)
+    # Stratified scenarios: IoT, Mobile/WAN, Datacenter/Cloud
+    n_iot = int(n_samples * 0.4)
+    n_mobile = int(n_samples * 0.3)
     n_cloud = n_samples - n_iot - n_mobile
 
     configs = [
-        # (count, cpu_range, mem_range, rtt_range, bw_range, loss_range, mtu_choices)
-        (n_iot, (30.0, 95.0), (16.0, 256.0), (40.0, 250.0), (0.1, 5.0), (0.5, 8.0), [576, 1280, 1500]),
-        (n_mobile, (10.0, 75.0), (512.0, 4096.0), (15.0, 80.0), (5.0, 80.0), (0.0, 3.0), [1400, 1500]),
-        (n_cloud, (5.0, 50.0), (4096.0, 32768.0), (0.5, 10.0), (100.0, 10000.0), (0.0, 0.2), [1500, 9000]),
+        (n_iot, (30.0, 95.0), (16.0, 256.0), (40.0, 250.0), (0.1, 5.0), (1.0, 8.0), [576, 1280, 1500]),
+        (n_mobile, (10.0, 75.0), (512.0, 4096.0), (15.0, 80.0), (5.0, 80.0), (0.0, 2.0), [1400, 1500]),
+        (n_cloud, (5.0, 50.0), (4096.0, 32768.0), (0.5, 10.0), (100.0, 10000.0), (0.0, 0.1), [1500, 9000]),
     ]
 
     for count, (cpu_min, cpu_max), (mem_min, mem_max), (rtt_min, rtt_max), (bw_min, bw_max), (loss_min, loss_max), mtus in configs:
@@ -104,11 +107,10 @@ def generate_synthetic_dataset(
             is_sign = bool(rng.choice([True, False]))
             target_op = "sign" if is_sign else "kem"
             
-            # Security requirement: 1, 2, 3, or 5
+            # Security requirement
             possible_sec = [1, 3, 5] if target_op == "kem" else [1, 2, 3, 5]
             req_sec = int(rng.choice(possible_sec))
 
-            # Select candidate algorithms matching op_type
             candidates = list_algorithms(op_type=target_op)  # type: ignore
             
             best_algo = None
@@ -128,7 +130,6 @@ def generate_synthetic_dataset(
                     best_score = score
                     best_algo = cand.name
 
-            # Fallback in rare case all negative
             if best_algo is None:
                 best_algo = candidates[0].name
 
