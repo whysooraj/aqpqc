@@ -52,6 +52,11 @@ def build_parser() -> argparse.ArgumentParser:
     select_parser.add_argument("--no-network-probe", action="store_true", help="Skip active network probing")
     select_parser.add_argument("--json", action="store_true", help="Output recommendation as JSON")
 
+    # 6. serve command
+    serve_parser = subparsers.add_parser("serve", help="Start FastAPI REST microservice")
+    serve_parser.add_argument("--host", default="0.0.0.0", help="Host interface to bind")
+    serve_parser.add_argument("--port", type=int, default=8000, help="Port to listen on")
+
     return parser
 
 
@@ -158,6 +163,17 @@ def run_cli(args: argparse.Namespace) -> int:
                 print(f"    - {cand['algorithm']} (Level {cand['security_level']}): score={cand['score']}, pubkey={cand['public_key_bytes']}B, payload={cand['payload_bytes']}B")
             print(f"\n  Rationale:\n    {result.explanation}\n")
         return 0
+
+    if cmd == "serve":
+        try:
+            import uvicorn
+            from aqpqc.api import app
+            print(f"Starting AQPQC REST Microservice on http://{args.host}:{args.port}")
+            uvicorn.run(app, host=args.host, port=args.port)
+            return 0
+        except ImportError:
+            print("Error: uvicorn and fastapi are required to run the service. Install with 'pip install .[api]'.", file=sys.stderr)
+            return 1
 
     return 1
 
